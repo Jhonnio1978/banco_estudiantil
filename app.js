@@ -1,109 +1,88 @@
-const supabaseUrl = 'https://fkqsdzwdzteacogjhkqm.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrcXNkendkenRlYWNvZ2poa3FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDExMzAwMDQsImV4cCI6MjA1NjcwNjAwNH0.iKGGMuh0WX939Kx95LmdZWqQM7u_GcSDjvEfiEn7NHA'
-const supabase = supabase.createClient(supabaseUrl, supabaseKey)
+document.getElementById("registerForm").addEventListener("submit", function(event) {
+    event.preventDefault();
 
-// Función para registrar un usuario
-async function registrarUsuario() {
-    let nombre = document.getElementById("nombre").value;
-    let telefono = document.getElementById("telefono").value;
-    let contraseña = document.getElementById("contraseña").value;
+    let name = document.getElementById("name").value;
+    let phone = document.getElementById("phone").value;
+    let accountType = document.getElementById("accountType").value;
+    let password = document.getElementById("password").value;
 
-    if (nombre === "" || telefono === "" || contraseña === "") {
-        alert("Por favor, completa todos los campos.");
-        return;
+    if (name && phone && accountType && password) {
+        let accountID = "ABE" + Math.floor(Math.random() * 1000000);
+        let user = { id: accountID, name, phone, type: accountType, password, balance: 0 };
+
+        let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+        accounts.push(user);
+        localStorage.setItem("accounts", JSON.stringify(accounts));
+
+        document.getElementById("accountID").innerText = "Tu ID de cuenta es: " + accountID;
+        document.getElementById("registerForm").reset();
     }
+});
 
-    let { data, error } = await supabase
-        .from('usuarios')
-        .insert([{ nombre, telefono, contraseña, saldo: 100 }]);
+function verifyAccount() {
+    let verifyID = document.getElementById("verifyID").value;
+    let verifyPassword = document.getElementById("verifyPassword").value;
+    let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+    let account = accounts.find(acc => acc.id === verifyID && acc.password === verifyPassword);
 
-    if (error) {
-        alert("Error al registrar el usuario: " + error.message);
+    if (account) {
+        document.getElementById("verificationResult").innerText = 
+            `Cuenta encontrada: ${account.name} - ${account.type} - Saldo: $${account.balance}`;
     } else {
-        document.getElementById("resultadoRegistro").innerHTML = 
-            `✅ ¡Registro exitoso!`;
-        document.getElementById("nombre").value = "";
-        document.getElementById("telefono").value = "";
-        document.getElementById("contraseña").value = "";
+        document.getElementById("verificationResult").innerText = "Cuenta no encontrada o contraseña incorrecta.";
     }
 }
 
-// Función para iniciar sesión
-async function iniciarSesion() {
-    let telefono = document.getElementById("loginCuenta").value;
-    let contraseña = document.getElementById("loginContraseña").value;
+function deposit() {
+    let accountID = document.getElementById("accountIDTransaction").value;
+    let password = document.getElementById("passwordTransaction").value;
+    let amount = parseFloat(document.getElementById("amount").value);
 
-    let { data: usuarios, error } = await supabase
-        .from('usuarios')
-        .select('*')
-        .eq('telefono', telefono)
-        .eq('contraseña', contraseña);
+    let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+    let account = accounts.find(acc => acc.id === accountID && acc.password === password);
 
-    if (error || usuarios.length === 0) {
-        document.getElementById("resultadoLogin").innerHTML = "⚠️ Cuenta o contraseña incorrecta.";
+    if (account && amount > 0) {
+        account.balance += amount;
+        localStorage.setItem("accounts", JSON.stringify(accounts));
+        alert(`Depósito exitoso. Nuevo saldo: $${account.balance}`);
     } else {
-        localStorage.setItem("usuarioActivo", JSON.stringify(usuarios[0]));
-        document.getElementById("resultadoLogin").innerHTML = `✅ ¡Bienvenido, ${usuarios[0].nombre}!`;
+        alert("Datos incorrectos o monto inválido.");
     }
 }
 
-// Función para verificar saldo
-function verificarSaldo() {
-    let usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
+function withdraw() {
+    let accountID = document.getElementById("accountIDTransaction").value;
+    let password = document.getElementById("passwordTransaction").value;
+    let amount = parseFloat(document.getElementById("amount").value);
 
-    if (usuarioActivo) {
-        document.getElementById("saldoCuenta").innerHTML = 
-            `💰 Tu saldo actual es: <b>${usuarioActivo.saldo} USD</b>`;
+    let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+    let account = accounts.find(acc => acc.id === accountID && acc.password === password);
+
+    if (account && amount > 0 && account.balance >= amount) {
+        account.balance -= amount;
+        localStorage.setItem("accounts", JSON.stringify(accounts));
+        alert(`Retiro exitoso. Nuevo saldo: $${account.balance}`);
     } else {
-        document.getElementById("saldoCuenta").innerHTML = "⚠️ Debes iniciar sesión primero.";
+        alert("Fondos insuficientes o datos incorrectos.");
     }
 }
 
-// Función para transferir dinero
-async function transferirDinero() {
-    let usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
-    let cuentaDestino = document.getElementById("cuentaDestino").value;
-    let monto = parseFloat(document.getElementById("montoTransferencia").value);
+function transfer() {
+    let senderID = document.getElementById("senderID").value;
+    let senderPassword = document.getElementById("senderPassword").value;
+    let receiverID = document.getElementById("receiverID").value;
+    let amount = parseFloat(document.getElementById("transferAmount").value);
 
-    if (!usuarioActivo) {
-        document.getElementById("resultadoTransferencia").innerHTML = "⚠️ Debes iniciar sesión.";
-        return;
-    }
+    let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+    let sender = accounts.find(acc => acc.id === senderID && acc.password === senderPassword);
+    let receiver = accounts.find(acc => acc.id === receiverID);
 
-    let { data: destinatario, error } = await supabase
-        .from('usuarios')
-        .select('*')
-        .eq('telefono', cuentaDestino)
-        .single();
-
-    if (error || !destinatario) {
-        document.getElementById("resultadoTransferencia").innerHTML = "⚠️ La cuenta destino no existe.";
-        return;
-    }
-
-    if (usuarioActivo.saldo < monto) {
-        document.getElementById("resultadoTransferencia").innerHTML = "⚠️ Saldo insuficiente.";
-        return;
-    }
-
-    // Actualizar saldos
-    let { error: errorUpdate1 } = await supabase
-        .from('usuarios')
-        .update({ saldo: usuarioActivo.saldo - monto })
-        .eq('telefono', usuarioActivo.telefono);
-
-    let { error: errorUpdate2 } = await supabase
-        .from('usuarios')
-        .update({ saldo: destinatario.saldo + monto })
-        .eq('telefono', cuentaDestino);
-
-    if (errorUpdate1 || errorUpdate2) {
-        document.getElementById("resultadoTransferencia").innerHTML = "⚠️ Error en la transferencia.";
+    if (sender && receiver && amount > 0 && sender.balance >= amount) {
+        sender.balance -= amount;
+        receiver.balance += amount;
+        localStorage.setItem("accounts", JSON.stringify(accounts));
+        alert(`Transferencia de $${amount} a ${receiver.id} exitosa.`);
     } else {
-        // Actualizar usuario activo en localStorage
-        usuarioActivo.saldo -= monto;
-        localStorage.setItem("usuarioActivo", JSON.stringify(usuarioActivo));
-        document.getElementById("resultadoTransferencia").innerHTML = 
-            `✅ Transferencia de ${monto} USD realizada a la cuenta ${cuentaDestino}`;
+        alert("Error en la transferencia.");
     }
 }
