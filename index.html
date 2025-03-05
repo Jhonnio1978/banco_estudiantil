@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABE - Asociación del Banco Estudiantil</title>
+    <link rel="stylesheet" href="bancoestudiantil/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="bancoestudiantil/script.js" defer></script>
+</head>
+<body>
+
+    <div class="header">🏦 ABE - Asociación del Banco Estudiantil</div>
+
+    <!-- Registro -->
+    <div class="container">
+        <h2>🔹 Registro de Usuario</h2>
+        <input type="text" id="nombre" placeholder="Nombre completo">
+        <input type="text" id="telefono" placeholder="Número de teléfono">
+        <input type="password" id="contraseña" placeholder="Contraseña">
+        <button onclick="registrarUsuario()">Registrarse</button>
+        <div id="resultadoRegistro"></div>
+    </div>
+
+    <!-- Inicio de sesión -->
+    <div class="container">
+        <h2>🔹 Iniciar Sesión</h2>
+        <input type="text" id="loginCuenta" placeholder="Número de cuenta">
+        <input type="password" id="loginContraseña" placeholder="Contraseña">
+        <button onclick="iniciarSesion()">Ingresar</button>
+        <div id="resultadoLogin"></div>
+    </div>
+
+    <!-- Verificar Saldo -->
+    <div class="container">
+        <h2>🔹 Consulta de Saldo</h2>
+        <button onclick="verificarSaldo()">Ver Saldo</button>
+        <div id="saldoCuenta"></div>
+    </div>
+
+    <!-- Transferencias -->
+    <div class="container">
+        <h2>🔹 Transferencia de Dinero</h2>
+        <input type="text" id="cuentaDestino" placeholder="Número de cuenta destino">
+        <input type="number" id="montoTransferencia" placeholder="Monto a transferir">
+        <button onclick="transferirDinero()">Transferir</button>
+        <div id="resultadoTransferencia"></div>
+    </div>
+
+    <div class="footer">📞 Asistencia: 829-332-9545 | ABE - Asociación del Banco Estudiantil © 2025</div>
+
+</body>
+</html>
