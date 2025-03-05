@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asociación del Banco Estudiantil (ABE)</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Banco Estudiantil (ABE)</h1>
+    </header>
+
+    <section class="container">
+        <h2>Registro de Cuenta</h2>
+        <form id="registerForm">
+            <input type="text" id="name" placeholder="Nombre" required>
+            <input type="tel" id="phone" placeholder="Número de Teléfono" required>
+            <select id="accountType" required>
+                <option value="">Seleccione tipo de cuenta</option>
+                <option value="Ahorro">Cuenta de Ahorro</option>
+                <option value="Crédito">Cuenta de Crédito</option>
+                <option value="Préstamo">Cuenta de Préstamo</option>
+            </select>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="submit">Registrar</button>
+        </form>
+        <p id="accountID"></p>
+    </section>
+
+    <section class="container">
+        <h2>Verificar Cuenta</h2>
+        <input type="text" id="verifyID" placeholder="Ingrese su ID de cuenta">
+        <input type="password" id="verifyPassword" placeholder="Contraseña">
+        <button onclick="verifyAccount()">Verificar</button>
+        <p id="verificationResult"></p>
+    </section>
+
+    <section class="container">
+        <h2>Operaciones Bancarias</h2>
+        <input type="text" id="accountIDTransaction" placeholder="ID de cuenta">
+        <input type="password" id="passwordTransaction" placeholder="Contraseña">
+        <input type="number" id="amount" placeholder="Monto">
+        <button onclick="deposit()">Depositar</button>
+        <button onclick="withdraw()">Retirar</button>
+    </section>
+
+    <section class="container">
+        <h2>Transferencias</h2>
+        <input type="text" id="senderID" placeholder="Tu ID de cuenta">
+        <input type="password" id="senderPassword" placeholder="Tu contraseña">
+        <input type="text" id="receiverID" placeholder="ID de cuenta del destinatario">
+        <input type="number" id="transferAmount" placeholder="Monto">
+        <button onclick="transfer()">Transferir</button>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
